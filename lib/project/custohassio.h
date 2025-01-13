@@ -5,13 +5,17 @@
 void custo_hassio_disc(){
 //    config_entity("switch","None","DEEPSLEEP","",true);
 //    config_entity("switch","None","Switch_Def","",true);
-//    config_trigger("PushButton");
+    config_trigger("PushButton");
+    config_entity("sensor","carbon_monoxide","Gas", "Telemetry");
+    config_entity("number","None","Timer");
 }
 
 void custo_hassio_del(){
 //    delete_entity("switch", "None", "DEEPSLEEP");
 //    delete_entity("switch","","Switch_Def");
-//    delete_trigger("PushButton");
+    delete_trigger("PushButton");
+    delete_entity("sensor","carbon_monoxide","Gas", "Telemetry");
+    delete_entity("number","None","Timer");
 }
 
 void custo_hassio_attr(){
@@ -47,8 +51,9 @@ void config_backup() {
 /*    config_doc["MIN_Pos"]    = config.MIN_TRAVEL;
     config_doc["MAX_Pos"]    = config.MAX_TRAVEL;
     config_doc["LOWER_Pos"]  = config.LOWER_LEVEL;
-    config_doc["UPPER_Pos"]  = config.UPPER_LEVEL;
 */
+    config_doc["UPPER_Pos"]  = config.UPPER_LEVEL;
+
     serializeJson(config_doc, config_jsonString);                           //Serialize JSON data to string
     //telnet_println("Backup string: " + String(config_jsonString));
     mqtt_publish(mqtt_pathconf, "BckpRstr", String(config_jsonString), true);

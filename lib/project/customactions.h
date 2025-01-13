@@ -9,9 +9,11 @@ void custom_mqtt(String command, String cmd_value) {
                 strcpy(config.DeviceName, config_doc["DeviceName"]);
                 strcpy(config.Location, config_doc["Location"]);
 /*
+                config.MIN_TRAVEL  =    config_doc["MIN_Pos"];
+                config.MAX_TRAVEL  =    config_doc["MAX_Pos"];
                 config.LOWER_LEVEL =    config_doc["LOWER_Pos"];
-                config.UPPER_LEVEL =    config_doc["UPPER_Pos"];
 */
+                config.UPPER_LEVEL =    config_doc["UPPER_Pos"];
                 storage_write();
                 bckp_rstr_flag = true;
                 telnet_println("BckpRstr with success");
@@ -27,6 +29,7 @@ void custom_update(){
     yield();
     //mqtt_publish(mqtt_pathtele, "DEEPSLEEP", String(config.DEEPSLEEP));
     //mqtt_publish(mqtt_pathtele, "Switch_Def", String(config.SWITCH_Default));
-    //ambient_data();
+    send_Telemetry();
+    mqtt_publish(mqtt_pathtele, "Timer", String(TIMER));
     //mqtt_dump_data(mqtt_pathtele, "Telemetry");
 }

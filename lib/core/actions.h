@@ -42,7 +42,7 @@ void on_message(const char* topic, byte* payload, unsigned int msg_length) {
     if ( command == "DEEPSLEEP" && cmd_value !="") { config.DEEPSLEEP = bool(cmd_value.toInt()); storage_write(); mqtt_publish(mqtt_pathcomd, "DEEPSLEEP", "", true); mqtt_publish(mqtt_pathtele, "DEEPSLEEP", String(config.DEEPSLEEP));}
     if ( command == "SLEEPTime" && cmd_value !="" && cmd_value.toInt() >= 0) { config.SLEEPTime = byte(cmd_value.toInt()); SLEEPTime = config.SLEEPTime * 60UL; storage_write(); mqtt_publish(mqtt_pathcomd, "SLEEPTime", "", true); }
     if ( command == "ONTime") { config.ONTime = byte(cmd_value.toInt());storage_write(); }
-    if ( command == "ExtendONTime") if (bool(cmd_value.toInt()) == true) Extend_time = 60; else Extend_time = 0;
+    if ( command == "ExtendONTime") { if (bool(cmd_value.toInt()) == true) Extend_time = 60; else Extend_time = 0; }
     if ( command == "LED") {config.LED = bool(cmd_value.toInt()); mqtt_publish(mqtt_pathtele, "LED", String(config.LED));}
     if ( command == "TELNET" && cmd_value !="") { config.TELNET = bool(cmd_value.toInt()); storage_write(); mqtt_publish(mqtt_pathcomd, "TELNET", "", true); telnet_setup(); }
     if ( command == "OTA" && cmd_value !="") { config.OTA = bool(cmd_value.toInt()); storage_write(); mqtt_publish(mqtt_pathcomd, "OTA", "", true); global_restart(); }
@@ -117,15 +117,17 @@ void on_message(const char* topic, byte* payload, unsigned int msg_length) {
             storage_write();
     }
 
-    // Standard Actuators/Actions 
+    // Standard Actuators/Actions
+    if ( command == "Flash") flash_LED((uint)abs(cmd_value.toInt()));
+    if ( command == "Buzz") Buzz((uint)abs(cmd_value.toInt()));
     if ( command == "Level") LEVEL = (uint)abs(cmd_value.toInt());
     if ( command == "Position") POSITION = cmd_value.toInt();
     if ( command == "Switch") {
         if ( SWITCH_Last == bool(cmd_value.toInt()) ) mqtt_publish(mqtt_pathtele, "Switch", String(SWITCH));
         else SWITCH = bool(cmd_value.toInt());
     }
-    if ( command == "Timer") TIMER = (ulong)abs(atol(cmd_value.c_str()));
-    if ( command == "Counter") COUNTER = (ulong)abs(atol(cmd_value.c_str()));
+    if ( command == "Timer") { TIMER = (ulong)abs(atol(cmd_value.c_str())); mqtt_publish(mqtt_pathtele, "Timer", String(TIMER)); }
+    if ( command == "Counter") { COUNTER = (ulong)abs(atol(cmd_value.c_str())); mqtt_publish(mqtt_pathtele, "Counter", String(COUNTER)); }
     if ( command == "Calibrate") { CALIBRATE = cmd_value.toFloat(); }
 
     // System Information and configuration

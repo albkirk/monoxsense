@@ -1,10 +1,15 @@
 // Declare and define here all Peripheral (sensors and actuators) used in this project.
 // **** Periphericals definition here ...
+// -- ADC PIN Definition --
+#define GAS_ADC_PIN      1          // IO pin for Carbon Monoxide GAS ADC measurement.
+#define Gas_Res_Div  false          // Do you have a Resistor divider (ence needs to calculate the proportion)?
+#define Gas_Res_High   100          // High Resistor value (in KOhms)
+#define Gas_Res_Lower  220          // Lower Resistor value (in KOhms)
 
 // **** Libraries to include here ...
 #include <buttons.h>
 //#include <touch.h>
-//#include <ambient.h>
+#include <ambient.h>
 //#include <mygps.h>
 
 // **** Peripherals and critical functions here ...
@@ -34,9 +39,10 @@ void peripherals_setup() {
       buttons_setup();
       //touch_setup();    
   // Start Ambient devices
-      //ambient_setup();
+      ambient_setup();
 
 // Wake-up validation
     on_wakeup();
+    TIMER = 5;                              // Time interval to measure the Gas level
 }
 

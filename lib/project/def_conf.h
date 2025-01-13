@@ -1,28 +1,28 @@
 // -- PLATFORM Selection --
 //DO NOT UNCOMMENT don't use this! #define ESP32          // already defined elsewhere...
 //DO NOT UNCOMMENT don't use this! #define ESP8266        // already defined somewhere...
-//#define ESP8285                                         // ESP8285 chip requires reduced MEM space (ex.: remove WEB page)  
-#undef ESP8266                                          // To make sure it is not used somewhere... 
-//#undef ESP32                                            // To make sure it is not used somewhere... 
-//#define ESP32C3                                         // ESP32-C3 chip differs from the ESP32.
+//#define ESP8285                                           // ESP8285 chip requires reduced MEM space (ex.: remove WEB page)  
+#undef ESP8266                                            // To make sure it is not used somewhere... 
+//#undef ESP32                                              // To make sure it is not used somewhere... 
+#define ESP32C3                                           // ESP32-C3 chip differs from the ESP32.
 
 // -- HARWARE & SOFTWARE Version --
 #define BRANDName           "AlBros_Team"                 // Hardware brand name
-#define MODELName           "GenBoxESP"                   // Hardware model name
-#define SWVer               "13.17"                       // Major.Minor Software version (use String 01.00 - 99.99 format !)
+#define MODELName           "MonoxSense"                  // Hardware model name
+#define SWVer               "01.01"                       // Major.Minor Software version (use String 01.00 - 99.99 format !)
 
 // -- Model Variants Definition --                        // Identify variants for acomodade small code changes 
 //-> Comment the definitions using //->
-//#define ModelVariant                                        // Ex.: MoesHouse cover, Ambisense version,... 
+//#define ModelVariant                                      // Ex.: MoesHouse cover, Ambisense version,... 
 #ifdef ModelVariant
 #else
 #endif
 
 // -- DIGITAL GPIO to Function Assignment --
-#define LED_ESP             48                            // 8266=2, ESP32=22, ESP32C3=8, T-Call=13, TTGoTS=22, T5=19, -1 means NOT used!
+#define LED_ESP              8                            // 8266=2, ESP32=22, ESP32C3=8, T-Call=13, TTGoTS=22, T5=19, -1 means NOT used!
 #define IR_PIN              -1                            // IR-LED Receiver PIN  -1 means NOT used!
-#define BUZZER              -1                            // (Active) Buzzer pin. Suggest to use pin 0. -1 means NOT used!
-#define Ext1WakeUP          -1                            // External Wake Up pin. (connected to GND, with Parallel Cap).  -1 means NOT used!
+#define BUZZER               0                            // (Active) Buzzer pin. Suggest to use pin 0. -1 means NOT used!
+#define BUZZER_OFF        HIGH                            // (Active) Buzzer OFF state. LOW=0v, HIGH=Vcc
 #define Reset_Btn           -1                            // Reset button to return to default configuration. -1 means NOT used! 
 #define BUT_A                9                            // Button A INPUT pin (used in buttons.h) TTGoTS=35, T5=39, TTGo T7=0
 #define BUT_B               -1                            // Button B INPUT pin (used in buttons.h) TTGoTS=34,
@@ -42,26 +42,21 @@
 #define NEOPixelsPIN        -1                            // NeoPixels DATA GPIO pin.
 #define NEOPixelsNUM        -1                            // Number of NeoPixels LEDs attached
 
-// -- Power Source & Battery Level --
+// -- Power, Battery & ULP --
 bool BattPowered =       false;                           // Is the device battery powered?
-#define Res_Div          false                            // Do you have a Resistor divider (ence needs to multiply by 2)?
-#define Res_High           100                            // High Resistor value (in KOhms)
-#define Res_Lower          100                            // Lower Resistor value (in KOhms)
+#define Batt_Res_Div      true                            // Do you have a Resistor divider (ence needs to calculate the proportion)?
+#define Batt_Res_High       10                            // High Resistor value (in KOhms)
+#define Batt_Res_Lower      22                            // Lower Resistor value (in KOhms)
 #define Batt_L_Thrs         15                            // Battery level threshold [0%-100%] (before slepping forever).
-#define Using_ADC         true                            // ESP8266 only. Will you use the external ADC? (if not, it will measure the internal voltage)
-//#define IP5306                                          // Power Management chip. TTGo T-Call module uses this.
-
-// -- ADC GPIO & ULP (ESP32 Only)
-//#define ULP_Support                                       //ESP32 ULP support. ESP32-S3 and ESP32-C3 not supported.
-#ifndef ESP8266
+#ifdef ESP32
     #define Batt_ADC_PIN    -1                            // IO pin for Battery ADC measurement. Default->36,  TFT->36, EPaper->35
-    #define NTC_ADC_PIN     -1                            // IO pin for NTC ADC measurement. Default->36,  TFT->36, EPaper->35
-    #define LUX_ADC_PIN     -1                            // IO pin for LUX ADC measurement. Default->36,  TFT->36, EPaper->35
+//    #define ULP_Support                                   // ESP32 ULP support. ESP32-S3 and ESP32-C3 not supported.
+    #define Ext1WakeUP      -1                            // ESP32 External Wake Up pin. (connected to GND, with Parallel Cap).  -1 means NOT used!
 #else
-    #define Batt_ADC_PIN    A0
-    #define NTC_ADC_PIN     A0
-    #define LUX_ADC_PIN     A0    
+    #define Using_ADC     true                            // ESP8266 only. Will you use the external ADC? (if not, it will measure the internal voltage)
+    #define Batt_ADC_PIN    A0                            // ESP8266 ADC pin (Hardcoded)
 #endif
+//#define IP5306                                          // Power Management chip. TTGo T-Call module uses this.
 
 // -- SPI PIN Definition --
 #define MISO_PIN            -1                            // SPI MISO pin, , -1 means NOT used!
@@ -77,10 +72,6 @@ bool BattPowered =       false;                           // Is the device batte
 #define I2S_WS              -1                            // Microphone WS PIN 2
 #define I2S_SCK             -1                            // Microphone SCK PIN 14
 #define I2S_SD              -1                            // Microphone SD PIN 15
-
-// -- DHT Definition --
-#define DHTTYPE              2                            // use 1 for "DHT11", 2 for "DHT22", or 3 for "AM2320" to select the DHT Model
-#define DHTPIN              -1                            // GPIO connected to DHT Data PIN. -1 means NO DHT used!
 
 // -- COMUNICATION Definition --
 //Bluetooth Definition
@@ -125,7 +116,7 @@ void config_defaults() {
     strcpy(config.ClientID, "001001");                    // Client ID (used on MQTT)
     config.ONTime = 10;                                   // 0-255 seconds (Byte range)
     config.SLEEPTime = 0;                                 // 0-255 minutes (Byte range)
-    config.DEEPSLEEP = true;                              // 0 - Disabled, 1 - Enabled
+    config.DEEPSLEEP = false;                             // 0 - Disabled, 1 - Enabled
     config.LED = true;                                    // 0 - OFF, 1 - ON
     config.TELNET = true;                                 // 0 - Disabled, 1 - Enabled
     config.OTA = true;                                    // 0 - Disabled, 1 - Enabled
@@ -166,7 +157,7 @@ void config_defaults() {
     config.DEBUG = true;                                  // 0 - No serial msgs, 1 - Debug msg sent to serial interface
     config.SW_Upgraded = false;                           // Is SW Upgrade completed? If not, clean the house and Update status.
     config.SWITCH_Default = false;                        // 0 - OFF, 1 - ON - Default SWITCH Status 
-    config.UPPER_LEVEL = 70;                              // level where blinds should stay when pressing double UP
+    config.UPPER_LEVEL = 300;                             // level where blinds should stay when pressing double UP
     config.LOWER_LEVEL = 10;                              // level where blinds should stay when pressing double DN
     config.MIN_TRAVEL = 0;                                // Time reference for fully DN position
     config.MAX_TRAVEL = 17000;                            // Time required to go from fully DN to fully UP

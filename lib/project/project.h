@@ -2,6 +2,7 @@
 // **** Project definitions here ...
 
 // **** Libraries to include here ...
+#include <telemetry.h>
 
 
 // **** Project code functions here ...
@@ -14,7 +15,10 @@ void project_setup() {
 
 void project_loop() {
   // Ambient handing
-      //if (TIMER >0) if ((millis() - 3500) % (TIMER * 60000) < 5) ambient_data();      // TIMER bigger than zero on div or dog bites!!
+    if (millis() > 30000) if ((millis()) % (TIMER * 60000) < 3) {  // After 30sec uptime, execute on every TIMER minutes
+        send_Telemetry();     
+        if ( Gas > config.UPPER_LEVEL) Buzz(10, 2000);
+    }
 
   // Button handling
         if (A_COUNT >= 1 && A_STATUS && (millis() - Last_A > 5000)) {
@@ -37,7 +41,7 @@ void project_loop() {
                 config.WEB = false;
                 config.APMode = false;
                 config.LED = false;
-                config.DEEPSLEEP = true;
+                if (BattPowered) config.DEEPSLEEP = true;
                 storage_write();
                 web_setup();                // needed to clean the ON extender time.
                 telnet_setup();
